@@ -102,4 +102,7 @@ Usage
                         ('09.1', 1),
                         ('10.1', 1),
                         ('08.2', 1)]}
+
+>>> pprint(cagr.total_students())
+{'curso': 'CIÊNCIAS DA COMPUTAÇÃO', 'estudantes': 497}
 ```
