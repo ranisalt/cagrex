@@ -3,7 +3,6 @@ import requests
 
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from threading import Thread, Lock
 from collections import Counter
 from bs4 import BeautifulSoup
 
@@ -84,9 +83,9 @@ class CAGR:
         self._browser = mechanicalsoup.StatefulBrowser()
         self._logged_in = False
 
-    def _students_from_forum(self):
+    def _students_from_forum(self, program_id):
         url = 'http://forum.cagr.ufsc.br/listarMembros.jsf'
-        params = {'salaId': '100000' + self.program_id()}
+        params = {'salaId': '100000' + program_id}
         self._browser.open(url, params=params)
         page = self._browser.get_current_page()
         students = page.find_all('tr', class_='cor1_celula_forum')
@@ -190,11 +189,11 @@ class CAGR:
         select = soup.find('select', id='formBusca:selectSemestre')
         return [option['value'] for option in select.find_all('option')]
 
-    def students_per_semester(self):
+    def students_per_semester(self, program_id):
         if not self._logged_in:
             raise NotLoggedIn()
 
-        students = self._students_from_forum()
+        students = self._students_from_forum(program_id)
         page = self._browser.get_current_page()
 
         counter = Counter()
@@ -214,11 +213,11 @@ class CAGR:
             'alunos_por_semestre': counter.most_common()
         }
 
-    def total_students(self):
+    def total_students(self, program_id):
         if not self._logged_in:
             raise NotLoggedIn()
 
-        students = self._students_from_forum()
+        students = self._students_from_forum(program_id)
         page = self._browser.get_current_page()
 
         program_name = page.find(
@@ -230,11 +229,11 @@ class CAGR:
             'estudantes': len(students)
         }
 
-    def suspended_students(self):
+    def suspended_students(self, program_id):
         if not self._logged_in:
             raise NotLoggedIn()
 
-        students = self._students_from_forum()
+        students = self._students_from_forum(program_id)
         page = self._browser.get_current_page()
 
         program_name = page.find(
